@@ -17,10 +17,9 @@ tile_size = int(image_size / 4)
 tile_outline = 6
 tile_radius = 20
 font = ImageFont.truetype("arial.ttf", 64, encoding="unic")
-
+assets_path = Path(abspath(__file__)).parent / "assets"
 yaml = YAML()
-with open(
-    Path(abspath(__file__)).parent / "assets/t_colors.yaml", "r", encoding="utf-8"
+with open(assets_path / "t_colors.yaml", "r", encoding="utf-8"
 ) as file:
     t_colors = yaml.load(file)
 
