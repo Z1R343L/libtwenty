@@ -83,9 +83,7 @@ def spawn_tile(board) -> np.ndarray:
 
 class Board:
     def __init__(self, size: int = 4) -> None:
-        """
-        [2048 board]
-
+        """[2048 board]
         Args:
             size (int, optional): [board size]. Defaults to 4.
         """
