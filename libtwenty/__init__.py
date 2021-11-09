@@ -1,8 +1,13 @@
+    """[2048 lib]
+
+    Returns:
+        [type]: [description]
+    """
+
+import pickle
 import random
 from copy import deepcopy
-from os.path import exists
 
-import dill as pickle
 import numpy as np
 from numpy.random import choice
 from PIL import Image, ImageDraw, ImageFont
@@ -14,13 +19,14 @@ image_size = 800
 tile_size = int(image_size / 4)
 tile_outline = 6
 tile_radius = 20
-font = ImageFont.truetype('assets/AGAALER.TTF', 48)
+font = ImageFont.truetype("assets/AGAALER.TTF", 48)
 
 yaml = YAML()
-with open('assets/t_colors.yaml', 'r', encoding='utf-8') as file:
+with open("assets/t_colors.yaml", "r", encoding="utf-8") as file:
     t_colors = yaml.load(file)
-    
+
 t_range = list(t_colors.keys())
+
 
 def font_color(tile: int) -> int:
     if tile in {2, 4}:
@@ -28,17 +34,18 @@ def font_color(tile: int) -> int:
     else:
         return 0xFFF1F6F8
 
-def prep_tiles() -> dict[Image]: 
+
+def prep_tiles() -> dict[Image]:
     tiles = {}
     for t in t_range:
-        t_im = Image.new('RGBA', (tile_size, tile_size), color=0x00000000) 
+        t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
         t_id = ImageDraw.Draw(t_im)
         t_id.rounded_rectangle(
             xy=[(0, 0), (tile_size, tile_size)],
             fill=t_colors[t],
             outline=0x00000000,
             width=tile_outline,
-            radius=tile_radius
+            radius=tile_radius,
         )
         if t != 0:
             tw, th = font.getsize(str(t))
@@ -47,7 +54,9 @@ def prep_tiles() -> dict[Image]:
         tiles[t] = t_im
     return tiles
 
+
 tiles = prep_tiles()
+
 
 def stack(board) -> None:
     for i in range(len(board)):
@@ -77,33 +86,40 @@ def spawn_tile(board) -> np.ndarray:
     return board
 
 
-
-
 class Board:
     def __init__(self, size: int = 4) -> None:
+        """[2048 board]
+
+        Args:
+            size (int, optional): [board size]. Defaults to 4.
+        """
         self.__dict__.clear()
         self.__board = np.zeros((size, size), int)
         self.__board = spawn_tile(board=self.__board)
         self.__board = spawn_tile(board=self.__board)
         self.__score = self.__board.sum()
         self.update_possible_moves()
-        
+
     def board_string(self) -> str:
         return str(self.__board)
-        
-    def state_string(self, divider: str ='_') -> str:
+
+    def state_string(self, divider: str = "_") -> str:
         string_list = [str(i) for i in np.nditer(self.__board)]
         return divider.join(string_list)
-        
+
     def render(self, quant: bool = True) -> Image:
-        im = Image.new('RGB', (image_size + (tile_outline * 2), image_size + (tile_outline * 2)), 0x8193A4)
+        im = Image.new(
+            "RGB",
+            (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
+            0x8193A4,
+        )
         for x in range(4):
             for y in range(4):
                 im_t = tiles[self.__board[x][y]]
                 y1, x1 = tile_size * x, tile_size * y
-                im.paste(im=im_t, box=(x1+tile_outline, y1+tile_outline), mask=im_t)
+                im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if quant:
-            im.convert('P', palette=Image.ADAPTIVE)
+            im.convert("P", palette=Image.ADAPTIVE)
         return im
 
     def load(self, data) -> None:
@@ -116,7 +132,7 @@ class Board:
     def completed(self) -> bool:
         return len(np.where(self.__board == 0)[0]) == 0
 
-    def move(self, action: str, eval: bool = False) -> bool:
+    def move(self, action: str, evaluate: bool = False) -> bool:
         board_copy = deepcopy(self.__board)
         rotated_board = np.rot90(board_copy, move_dict[action])
         stack(rotated_board)
@@ -126,7 +142,7 @@ class Board:
         if np.array_equal(self.__board, board_copy, equal_nan=False):
             return False
 
-        if not eval:
+        if not evaluate:
             self.__board = board_copy
             self.__board = spawn_tile(board=self.__board)
             self.calculate_score()
@@ -138,12 +154,12 @@ class Board:
     def possible_moves(self) -> dict:
         res, n, over = {}, 0, False
         for direction in ["left", "right", "up", "down"]:
-            res[direction] = self.move(action=direction, eval=True)
+            res[direction] = self.move(action=direction, evaluate=True)
             if not res[direction]:
-                n +=1
+                n += 1
         if n == 4:
             over = True
-        res['over'] = over
+        res["over"] = over
         return res
 
     def calculate_score(self) -> None:
@@ -151,4 +167,3 @@ class Board:
 
     def score(self) -> int:
         return int(self.__score)
-
