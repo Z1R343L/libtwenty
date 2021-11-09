@@ -12,4 +12,5 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=requirements,
     python_requires=">=3.9",
+    include_package_data=True
 )
