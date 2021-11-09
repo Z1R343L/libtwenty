@@ -1,5 +1,6 @@
 #! /usr/bin/python3
 """[2048 lib]"""
+from os.path import dirname, join
 import secrets
 from copy import deepcopy
 
@@ -14,7 +15,7 @@ image_size = 800
 tile_size = int(image_size / 4)
 tile_outline = 6
 tile_radius = 20
-font = ImageFont.truetype("assets/AGAALER.TTF", 48)
+font = ImageFont.truetype("arial.ttf", 64)
 
 yaml = YAML()
 with open("assets/t_colors.yaml", "r", encoding="utf-8") as file:
