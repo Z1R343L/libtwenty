@@ -2,8 +2,6 @@
 [2048 lib]
 
 """
-
-
 import secrets
 from copy import deepcopy
 from os.path import abspath
@@ -20,9 +18,7 @@ image_size = 800
 tile_size = int(image_size / 4)
 tile_outline = 6
 tile_radius = 20
-
 assets_path = Path(abspath(__file__)).parent / "assets"
-
 font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), 52, encoding="unic")
 
 yaml = YAML()
