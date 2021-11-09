@@ -2,6 +2,8 @@
 """[2048 lib]"""
 import secrets
 from copy import deepcopy
+from os.path import abspath
+from pathlib import Path
 
 import numpy as np
 from numpy.random import choice
@@ -17,7 +19,9 @@ tile_radius = 20
 font = ImageFont.truetype("arial.ttf", 64, encoding="unic")
 
 yaml = YAML()
-with open("assets/t_colors.yaml", "r", encoding="utf-8") as file:
+with open(
+    Path(abspath(__file__)).parent / "assets/t_colors.yaml", "r", encoding="utf-8"
+) as file:
     t_colors = yaml.load(file)
 
 t_range = list(t_colors.keys())
