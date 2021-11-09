@@ -1,5 +1,9 @@
-#! /usr/bin/python3
-"""[2048 lib]"""
+"""
+[2048 lib]
+
+"""
+
+
 import secrets
 from copy import deepcopy
 from os.path import abspath
@@ -88,7 +92,8 @@ def spawn_tile(board) -> np.ndarray:
 
 class Board:
     def __init__(self, size: int = 4) -> None:
-        """[2048 board]
+        """
+        [2048 board]
         Args:
             size (int, optional): [board size]. Defaults to 4.
         """
@@ -97,16 +102,37 @@ class Board:
         self.__board = spawn_tile(board=self.__board)
         self.__board = spawn_tile(board=self.__board)
         self.__score = self.__board.sum()
-        self.update_possible_moves()
+        self.__update_possible_moves()
 
     def board_string(self) -> str:
+        """[returns the boards ndarray as str]
+
+        Returns:
+            str: [the boards ndarray as str]
+        """
         return str(self.__board)
 
     def state_string(self, divider: str = "_") -> str:
+        """[returns the tile values as flattened str]
+
+        Args:
+            divider (str, optional): [str to divide the values with]. Defaults to "_".
+
+        Returns:
+            str: [flattened tile-values string]
+        """
         string_list = [str(i) for i in np.nditer(self.__board)]
         return divider.join(string_list)
 
-    def render(self, quant: bool = True) -> Image:
+    def render(self, quant: bool = False) -> Image:
+        """[renders the board and returns the pilow image]
+
+        Args:
+            quant (bool, optional): [convert from RGB to P, slower, smaller files]. Defaults to False.
+
+        Returns:
+            Image: [pillow image object]
+        """
         im = Image.new(
             "RGB",
             (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
@@ -122,16 +148,32 @@ class Board:
         return im
 
     def load(self, data: dict) -> None:
+        """[load existing board state from dump]
+
+        Args:
+            data (dict): [the dump]
+        """
         self.__dict__.clear()
         self.__dict__.update(data)
 
     def dump(self) -> dict:
+        """[dump current board state]
+
+        Returns:
+            dict: [the dumped board state as dict]
+        """
         return self.__dict__
 
-    def completed(self) -> bool:
-        return len(np.where(self.__board == 0)[0]) == 0
-
     def move(self, action: str, evaluate: bool = False) -> bool:
+        """[summary]
+
+        Args:
+            action (str): [direction to move, (up|down|left|right)]
+            evaluate (bool, optional): [just try not proceed]. Defaults to False.
+
+        Returns:
+            bool: [if the move succeeded]
+        """
         board_copy = deepcopy(self.__board)
         rotated_board = np.rot90(board_copy, move_dict[action])
         stack(rotated_board)
@@ -140,17 +182,21 @@ class Board:
         board_copy = np.rot90(rotated_board, len(self.__board) - move_dict[action])
         if np.array_equal(self.__board, board_copy, equal_nan=False):
             return False
-
         if not evaluate:
             self.__board = board_copy
             self.__board = spawn_tile(board=self.__board)
-            self.calculate_score()
+            self.__calculate_score()
         return True
 
-    def update_possible_moves(self):
+    def __update_possible_moves(self):
         self.__possible_moves = self.possible_moves()
 
     def possible_moves(self) -> dict:
+        """[evaluates which move directions can succeeed]
+
+        Returns:
+            dict: [dict with the results]
+        """
         res, n, over = {}, 0, False
         for direction in ["left", "right", "up", "down"]:
             res[direction] = self.move(action=direction, evaluate=True)
@@ -161,8 +207,13 @@ class Board:
         res["over"] = over
         return res
 
-    def calculate_score(self) -> None:
+    def __calculate_score(self) -> None:
         self.__score = int(self.__board.sum())
 
     def score(self) -> int:
+        """[returns the current score]
+
+        Returns:
+            int: [current score]
+        """
         return int(self.__score)
