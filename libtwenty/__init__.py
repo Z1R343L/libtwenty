@@ -14,7 +14,6 @@ image_size = 800
 tile_size = int(image_size / 4)
 tile_outline = 6
 tile_radius = 20
-image_path = '/static/board_images/'
 font = ImageFont.truetype('assets/AGAALER.TTF', 48)
 
 yaml = YAML()
@@ -24,7 +23,7 @@ with open('assets/t_colors.yaml', 'r', encoding='utf-8') as file:
 t_range = list(t_colors.keys())
 
 def font_color(tile: int) -> int:
-    if tile == 2 or tile == 4:
+    if tile in {2, 4}:
         return 0xFF656E77
     else:
         return 0xFFF1F6F8
@@ -51,8 +50,8 @@ def prep_tiles() -> dict[Image]:
 tiles = prep_tiles()
 
 def stack(board) -> None:
-    for i in range(0, len(board)):
-        for j in range(0, len(board)):
+    for i in range(len(board)):
+        for j in range(len(board)):
             k = i
             while board[k][j] == 0:
                 if k == len(board) - 1:
@@ -63,8 +62,8 @@ def stack(board) -> None:
 
 
 def sum_up(board) -> None:
-    for i in range(0, len(board) - 1):
-        for j in range(0, len(board)):
+    for i in range(len(board) - 1):
+        for j in range(len(board)):
             if board[i][j] != 0 and board[i][j] == board[i + 1][j]:
                 board[i][j] += board[i + 1][j]
                 board[i + 1][j] = 0
@@ -89,16 +88,17 @@ class Board:
         self.__score = self.__board.sum()
         self.update_possible_moves()
         
+    def board_string(self) -> str:
+        return str(self.__board)
+        
     def state_string(self, divider: str ='_') -> str:
-        string_list = []
-        for i in np.nditer(self.__board):
-            string_list.append(str(i))
+        string_list = [str(i) for i in np.nditer(self.__board)]
         return divider.join(string_list)
         
     def render(self, quant: bool = True) -> Image:
         im = Image.new('RGB', (image_size + (tile_outline * 2), image_size + (tile_outline * 2)), 0x8193A4)
-        for x in range(0, 4):
-            for y in range(0, 4):
+        for x in range(4):
+            for y in range(4):
                 im_t = tiles[self.__board[x][y]]
                 y1, x1 = tile_size * x, tile_size * y
                 im.paste(im=im_t, box=(x1+tile_outline, y1+tile_outline), mask=im_t)
@@ -123,14 +123,14 @@ class Board:
         sum_up(rotated_board)
         stack(rotated_board)
         board_copy = np.rot90(rotated_board, len(self.__board) - move_dict[action])
-        if not np.array_equal(self.__board, board_copy, equal_nan=False):
-            if not eval:
-                self.__board = board_copy
-                self.__board = spawn_tile(board=self.__board)
-                self.calculate_score()
-            return True
-        else:
+        if np.array_equal(self.__board, board_copy, equal_nan=False):
             return False
+
+        if not eval:
+            self.__board = board_copy
+            self.__board = spawn_tile(board=self.__board)
+            self.calculate_score()
+        return True
 
     def update_possible_moves(self):
         self.__possible_moves = self.possible_moves()
