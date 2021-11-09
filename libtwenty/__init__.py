@@ -105,7 +105,8 @@ class Board:
         self.__update_possible_moves()
 
     def board_string(self) -> str:
-        """[returns the boards ndarray as str]
+        """
+        [returns the boards ndarray as str]
 
         Returns:
             str: [the boards ndarray as str]
@@ -113,7 +114,8 @@ class Board:
         return str(self.__board)
 
     def state_string(self, divider: str = "_") -> str:
-        """[returns the tile values as flattened str]
+        """
+        [returns the tile values as flattened str]
 
         Args:
             divider (str, optional): [str to divide the values with]. Defaults to "_".
@@ -125,7 +127,8 @@ class Board:
         return divider.join(string_list)
 
     def render(self, quant: bool = False) -> Image:
-        """[renders the board and returns the pilow image]
+        """
+        [renders the board and returns the pilow image]
 
         Args:
             quant (bool, optional): [convert from RGB to P, slower, smaller files]. Defaults to False.
@@ -148,7 +151,8 @@ class Board:
         return im
 
     def load(self, data: dict) -> None:
-        """[load existing board state from dump]
+        """
+        [load existing board state from dump]
 
         Args:
             data (dict): [the dump]
@@ -157,7 +161,8 @@ class Board:
         self.__dict__.update(data)
 
     def dump(self) -> dict:
-        """[dump current board state]
+        """
+        [dump current board state]
 
         Returns:
             dict: [the dumped board state as dict]
@@ -165,7 +170,8 @@ class Board:
         return self.__dict__
 
     def move(self, action: str, evaluate: bool = False) -> bool:
-        """[summary]
+        """
+        [summary]
 
         Args:
             action (str): [direction to move, (up|down|left|right)]
@@ -192,7 +198,8 @@ class Board:
         self.__possible_moves = self.possible_moves()
 
     def possible_moves(self) -> dict:
-        """[evaluates which move directions can succeeed]
+        """
+        [evaluates which move directions can succeeed]
 
         Returns:
             dict: [dict with the results]
@@ -211,7 +218,8 @@ class Board:
         self.__score = int(self.__board.sum())
 
     def score(self) -> int:
-        """[returns the current score]
+        """
+        [returns the current score]
 
         Returns:
             int: [current score]
