@@ -1,11 +1,5 @@
-    """[2048 lib]
-
-    Returns:
-        [type]: [description]
-    """
-
-import pickle
-import random
+"""[2048 lib]"""
+import secrets
 from copy import deepcopy
 
 import numpy as np
@@ -82,7 +76,7 @@ def spawn_tile(board) -> np.ndarray:
     zeroes_flatten = np.where(board == 0)
     zeroes_indices = [(x, y) for x, y in zip(zeroes_flatten[0], zeroes_flatten[1])]
     random_index = zeroes_indices[choice(len(zeroes_indices), 1)[0]]
-    board[random_index] = random.choice([2, 2, 4])
+    board[random_index] = secrets.choice([2, 2, 4])
     return board
 
 
@@ -122,12 +116,12 @@ class Board:
             im.convert("P", palette=Image.ADAPTIVE)
         return im
 
-    def load(self, data) -> None:
+    def load(self, data: dict) -> None:
         self.__dict__.clear()
-        self.__dict__.update(pickle.loads(data))
+        self.__dict__.update(data)
 
-    def dump(self) -> bytes:
-        return pickle.dumps(self.__dict__)
+    def dump(self) -> dict:
+        return self.__dict__
 
     def completed(self) -> bool:
         return len(np.where(self.__board == 0)[0]) == 0
