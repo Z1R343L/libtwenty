@@ -3,6 +3,7 @@
 
 """
 import secrets
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from copy import deepcopy
 from os.path import abspath
 from pathlib import Path
@@ -10,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from numpy.random import choice
 from PIL import Image, ImageDraw, ImageFont
-from ruamel.yaml import YAML
+import srsly
 
 move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
@@ -21,9 +22,7 @@ tile_radius = 20
 assets_path = Path(abspath(__file__)).parent / "assets"
 font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), 52, encoding="unic")
 
-yaml = YAML()
-with open(assets_path / "t_colors.yaml", "r", encoding="utf-8") as file:
-    t_colors = yaml.load(file)
+t_colors = srsly.read_yaml(assets_path / "t_colors.yaml")
 
 t_range = list(t_colors.keys())
 
@@ -35,7 +34,7 @@ def font_color(tile: int) -> int:
         return 0xFFF1F6F8
 
 
-def prep_tiles() -> dict[Image]:
+def prep_tiles() -> dict:
     tiles = {}
     for t in t_range:
         t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
@@ -94,11 +93,11 @@ class Board:
             size (int, optional): [board size]. Defaults to 4.
         """
         self.__dict__.clear()
-        self.__board = np.zeros((size, size), int)
-        self.__board = spawn_tile(board=self.__board)
-        self.__board = spawn_tile(board=self.__board)
-        self.__score = self.__board.sum()
-        self.__update_possible_moves()
+        self.board = np.zeros((size, size), int)
+        self.board = spawn_tile(board=self.board)
+        self.board = spawn_tile(board=self.board)
+        self.score = self.board.sum()
+        self.update_possible_moves()
 
     def board_string(self) -> str:
         """
@@ -107,7 +106,7 @@ class Board:
         Returns:
             str: [the boards ndarray as str]
         """
-        return str(self.__board)
+        return str(self.board)
 
     def state_string(self, divider: str = "_") -> str:
         """
@@ -119,12 +118,12 @@ class Board:
         Returns:
             str: [flattened tile-values string]
         """
-        string_list = [str(i) for i in np.nditer(self.__board)]
+        string_list = [str(i) for i in np.nditer(self.board)]
         return divider.join(string_list)
 
     def render(self, quant: bool = False) -> Image:
         """
-        [renders the board and returns the pilow image]
+        [renders the board and returns the pillow image]
 
         Args:
             quant (bool, optional): [convert from RGB to P, slower, smaller files]. Defaults to False.
@@ -154,16 +153,16 @@ class Board:
             data (dict): [the dump]
         """
         self.__dict__.clear()
-        self.__dict__.update(data)
+        self.__dict__.update(srsly.msgpack_loads(urlsafe_b64decode(data)))
 
-    def dump(self) -> dict:
+    def dump(self) -> bytes:
         """
         [dump current board state]
 
         Returns:
-            dict: [the dumped board state as dict]
+            dict: [the dumped board state as bytes]
         """
-        return self.__dict__
+        return urlsafe_b64encode(srsly.msgpack_dumps(self.__dict__))
 
     def move(self, action: str, evaluate: bool = False) -> bool:
         """
@@ -176,22 +175,22 @@ class Board:
         Returns:
             bool: [if the move succeeded]
         """
-        board_copy = deepcopy(self.__board)
+        board_copy = deepcopy(self.board)
         rotated_board = np.rot90(board_copy, move_dict[action])
         stack(rotated_board)
         sum_up(rotated_board)
         stack(rotated_board)
-        board_copy = np.rot90(rotated_board, len(self.__board) - move_dict[action])
-        if np.array_equal(self.__board, board_copy, equal_nan=False):
+        board_copy = np.rot90(rotated_board, len(self.board) - move_dict[action])
+        if np.array_equal(self.board, board_copy, equal_nan=False):
             return False
         if not evaluate:
-            self.__board = board_copy
-            self.__board = spawn_tile(board=self.__board)
-            self.__calculate_score()
+            self.board = board_copy
+            self.board = spawn_tile(board=self.board)
+            self.calculate_score()
         return True
 
-    def __update_possible_moves(self):
-        self.__possible_moves = self.possible_moves()
+    def update_possible_moves(self):
+        self.possible_moves = self.possible_moves()
 
     def possible_moves(self) -> dict:
         """
@@ -210,8 +209,8 @@ class Board:
         res["over"] = over
         return res
 
-    def __calculate_score(self) -> None:
-        self.__score = int(self.__board.sum())
+    def calculate_score(self) -> None:
+        self.score = int(self.board.sum())
 
     def score(self) -> int:
         """
@@ -220,4 +219,4 @@ class Board:
         Returns:
             int: [current score]
         """
-        return int(self.__score)
+        return int(self.score)

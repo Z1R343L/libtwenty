@@ -1,3 +1,3 @@
 numpy
 pillow
-ruamel.yaml
+srsly
