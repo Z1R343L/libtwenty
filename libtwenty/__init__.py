@@ -138,7 +138,7 @@ class Board:
         )
         for x in range(4):
             for y in range(4):
-                im_t = tiles[self.__board[x][y]]
+                im_t = tiles[self.board[x][y]]
                 y1, x1 = tile_size * x, tile_size * y
                 im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if quant:
