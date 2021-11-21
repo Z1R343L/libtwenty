@@ -187,6 +187,7 @@ class Board:
             self.board = board_copy
             self.board = spawn_tile(board=self.board)
             self.calculate_score()
+            self.update_possible_moves()
         return True
 
     def update_possible_moves(self):
