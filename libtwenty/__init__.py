@@ -187,13 +187,10 @@ class Board:
             self.board = board_copy
             self.board = spawn_tile(board=self.board)
             self.calculate_score()
-            self.update_possible_moves()
+            self.possible_moves = self.update_possible_moves()
         return True
 
-    def update_possible_moves(self):
-        self.possible_moves = self.possible_moves()
-
-    def possible_moves(self) -> dict:
+    def update_possible_moves(self) -> dict:
         """
         [evaluates which move directions can succeeed]
 
