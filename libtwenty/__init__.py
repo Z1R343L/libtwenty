@@ -57,11 +57,11 @@ tiles = prep_tiles()
 
 
 def stack(board) -> None:
-    for i in range(len(board)):
-        for j in range(len(board)):
+    for i in range(board.size):
+        for j in range(board.size):
             k = i
             while board[k][j] == 0:
-                if k == len(board) - 1:
+                if k == board.size - 1:
                     break
                 k += 1
             if k != i:
