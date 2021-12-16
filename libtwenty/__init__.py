@@ -69,8 +69,8 @@ def stack(board) -> None:
 
 
 def sum_up(board) -> None:
-    for i in range(0, len(board) ):
-        for j in range(0, len(board) - 1):
+    for i in range(0, len(board) - 1):
+        for j in range(0, len(board)):
             if board[i][j] != 0 and board[i][j] == board[i + 1][j]:
                 board[i][j] += board[i + 1][j]
                 board[i + 1][j] = 0
