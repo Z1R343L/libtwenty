@@ -57,8 +57,8 @@ tiles = prep_tiles()
 
 
 def stack(board) -> None:
-    for i in range(len(board) - 1):
-        for j in range(len(board) - 1):
+    for i in range(0, len(board)):
+        for j in range(0, len(board)):
             k = i
             while board[k][j] == 0:
                 if k == len(board) - 1:
@@ -69,8 +69,8 @@ def stack(board) -> None:
 
 
 def sum_up(board) -> None:
-    for i in range(len(board) - 1):
-        for j in range(len(board) - 1):
+    for i in range(0, len(board)):
+        for j in range(0, len(board)):
             if board[i][j] != 0 and board[i][j] == board[i + 1][j]:
                 board[i][j] += board[i + 1][j]
                 board[i + 1][j] = 0
