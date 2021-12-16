@@ -15,8 +15,7 @@ import srsly
 
 move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
-image_size = 800
-tile_size = int(image_size / 4)
+tile_size = 200
 tile_outline = 6
 tile_radius = 20
 assets_path = Path(abspath(__file__)).parent / "assets"
@@ -98,6 +97,7 @@ class Board:
         self.board = spawn_tile(board=self.board)
         self.score = self.board.sum()
         self.update_possible_moves()
+        self.size = size
 
     def board_string(self) -> str:
         """
@@ -131,13 +131,14 @@ class Board:
         Returns:
             Image: [pillow image object]
         """
+        image_size = tile_size * self.size
         im = Image.new(
             "RGB",
             (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
             0x8193A4,
         )
-        for x in range(4):
-            for y in range(4):
+        for x in range(self.size):
+            for y in range(self.size):
                 im_t = tiles[self.board[x][y]]
                 y1, x1 = tile_size * x, tile_size * y
                 im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
