@@ -3,10 +3,10 @@
 
 """
 import secrets
-from base64 import urlsafe_b64decode, urlsafe_b64encode
 from copy import deepcopy
 from os.path import abspath
 from pathlib import Path
+from typing import Optional, Literal, Union
 
 import numpy as np
 from numpy.random import choice
@@ -85,14 +85,19 @@ def spawn_tile(board) -> np.ndarray:
 
 
 class Board:
-    def __init__(self, size: int = 4) -> None:
+    def __init__(
+        self,
+        size: int = 4,
+        state_string: Optional[str] = None
+    ) -> None:
         """
         [2048 board]
         Args:
             size (int, optional): [board size]. Defaults to 4.
         """
-        self.__dict__.clear()
         self.board = np.zeros((size, size), int)
+        if state_string:
+            self.from_state_string(state_string=state_string)
         self.board = spawn_tile(board=self.board)
         self.board = spawn_tile(board=self.board)
         self.score = self.board.sum()
@@ -100,37 +105,25 @@ class Board:
         self.size = size
 
     def board_string(self) -> str:
-        """
-        [returns the boards ndarray as str]
-
-        Returns:
-            str: [the boards ndarray as str]
-        """
         return str(self.board)
 
-    def state_string(self, divider: str = "_") -> str:
-        """
-        [returns the tile values as flattened str]
+    def to_state_string(self) -> str:
+        return '_'.join([str(t_range[i]) for i in np.nditer(self.board)])
+    
+    def from_state_string(state_string: str) -> None:
+        row, current_row = [0] * 2
+        for i in state_string.split('_'):
+            self.board[row][current_row] = t_range[int(i)]
+            if current_row == 3:
+                current_row = 0
+                row += 1
+            else:
+                current_row += 1
 
-        Args:
-            divider (str, optional): [str to divide the values with]. Defaults to "_".
 
-        Returns:
-            str: [flattened tile-values string]
-        """
-        string_list = [str(i) for i in np.nditer(self.board)]
-        return divider.join(string_list)
 
-    def render(self, quant: bool = False) -> Image:
-        """
-        [renders the board and returns the pillow image]
+    def render(self) -> Image:
 
-        Args:
-            quant (bool, optional): [convert from RGB to P, slower, smaller files]. Defaults to False.
-
-        Returns:
-            Image: [pillow image object]
-        """
         image_size = tile_size * self.size
         im = Image.new(
             "RGB",
@@ -142,40 +135,14 @@ class Board:
                 im_t = tiles[self.board[x][y]]
                 y1, x1 = tile_size * x, tile_size * y
                 im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
-        if quant:
-            im.convert("P", palette=Image.ADAPTIVE)
         return im
 
-    def load(self, data: dict) -> None:
-        """
-        [load existing board state from dump]
 
-        Args:
-            data (dict): [the dump]
-        """
-        self.__dict__.clear()
-        self.__dict__.update(srsly.msgpack_loads(urlsafe_b64decode(data)))
-
-    def dump(self) -> bytes:
-        """
-        [dump current board state]
-
-        Returns:
-            dict: [the dumped board state as bytes]
-        """
-        return urlsafe_b64encode(srsly.msgpack_dumps(self.__dict__))
-
-    def move(self, action: str, evaluate: bool = False) -> bool:
-        """
-        [summary]
-
-        Args:
-            action (str): [direction to move, (up|down|left|right)]
-            evaluate (bool, optional): [just try not proceed]. Defaults to False.
-
-        Returns:
-            bool: [if the move succeeded]
-        """
+    def move(
+        self, 
+        action: Union[int, Literal[list(move_dict.keys())]],
+        evaluate: bool = False
+    ) -> bool:
         board_copy = deepcopy(self.board)
         rotated_board = np.rot90(board_copy, move_dict[action])
         stack(rotated_board)
@@ -191,7 +158,7 @@ class Board:
             self.possible_moves = self.update_possible_moves()
         return True
 
-    def update_possible_moves(self) -> dict:
+    def update_possible_moves(self) -> None:
         """
         [evaluates which move directions can succeeed]
 
@@ -206,16 +173,8 @@ class Board:
         if n == 4:
             over = True
         res["over"] = over
-        return res
+        self.possible_moves = res
 
     def calculate_score(self) -> None:
         self.score = int(self.board.sum())
 
-    def score(self) -> int:
-        """
-        [returns the current score]
-
-        Returns:
-            int: [current score]
-        """
-        return int(self.score)
