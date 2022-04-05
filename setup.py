@@ -11,6 +11,6 @@ setuptools.setup(
     url="https://github.com/z1r343l",
     packages=setuptools.find_packages(),
     install_requires=requirements,
-    python_requires=">=3.9",
+    python_requires=">=3.8",
     include_package_data=True,
 )

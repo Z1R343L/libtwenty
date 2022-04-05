@@ -110,7 +110,7 @@ class Board:
     def to_state_string(self) -> str:
         return '_'.join([str(t_range[i]) for i in np.nditer(self.board)])
     
-    def from_state_string(state_string: str) -> None:
+    def from_state_string(self, state_string: str) -> None:
         row, current_row = [0] * 2
         for i in state_string.split('_'):
             self.board[row][current_row] = t_range[int(i)]
