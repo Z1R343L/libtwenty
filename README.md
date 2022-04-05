@@ -2,8 +2,7 @@
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/z1r343l/libtwenty?logo=buffer&logoColor=white)
 ![Codacy grade](https://img.shields.io/codacy/grade/8d08c5eef9544b86b38bac741d586f7f?logo=codacy&logoColor=white)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/z1r343l/libtwenty?logo=snyk&logoColor=white)
-![mypy](https://img.shields.io/badge/mypy-passing-brightgreen?logo=python&logoColor=white)
+
 
 
 ## installation
@@ -12,7 +11,6 @@
 
 ![numpy](https://img.shields.io/pypi/v/numpy?label=numpy&logo=numpy&logoColor=white&style=flat-square)
 ![PyPI](https://img.shields.io/pypi/v/pillow?label=pillow&logo=googlephotos&logoColor=white&style=flat-square)
-![PyPI](https://img.shields.io/pypi/v/ruamel.yaml?label=ruamel.yaml&logo=googlesheets&logoColor=white&style=flat-square)
 
 ```Shell
 pip install git+https://github.com/Z1R343L/libtwenty
