@@ -6,7 +6,6 @@
 
 
 ## installation
-
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/z1r343l/libtwenty?logo=pypi&logoColor=white&style=for-the-badge)
 
 ![numpy](https://img.shields.io/pypi/v/numpy?label=numpy&logo=numpy&logoColor=white&style=flat-square)

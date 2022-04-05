@@ -108,7 +108,7 @@ class Board:
 
     def to_state_string(self) -> str:
         return ''.join(f'{i:2d}' for i in np.nditer(self.board))
-    
+
     def from_state_string(self, state_string: str) -> None:
         self.board = np.reshape([int(state_string[i : i + 2]) for i in range(0, 32, 2)], (4, 4))
 
