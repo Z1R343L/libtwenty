@@ -4,6 +4,7 @@ from copy import deepcopy
 from os.path import abspath
 from pathlib import Path
 from typing import Optional, Union
+from io import BytesIO
 
 import numpy as np
 from numpy.random import choice
@@ -107,12 +108,12 @@ class Board:
         return str(self.board)
 
     def to_state_string(self) -> str:
-        return ''.join(f'{i:2d}' for i in np.nditer(self.board))
+        return ''.join(f'{i:02d}' for i in np.nditer(self.board))
 
     def from_state_string(self, state_string: str) -> None:
         self.board = np.reshape([int(state_string[i : i + 2]) for i in range(0, 32, 2)], (4, 4))
 
-    def render(self) -> Image:
+    def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
         image_size = tile_size * self.size
         im = Image.new(
             "RGB",
@@ -123,6 +124,10 @@ class Board:
             im_t = tiles[self.board[x][y]]
             y1, x1 = tile_size * x, tile_size * y
             im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
+        if bytesio:
+            with BytesIO as buffer:
+                im.save(buffer, 'PNG')
+                return buffer
         return im
 
 
