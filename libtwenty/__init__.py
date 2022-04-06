@@ -125,7 +125,7 @@ class Board:
             y1, x1 = tile_size * x, tile_size * y
             im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if bytesio:
-            with BytesIO as buffer:
+            with BytesIO() as buffer:
                 im.save(buffer, 'PNG')
                 return buffer
         return im
