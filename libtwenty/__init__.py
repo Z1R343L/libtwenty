@@ -137,8 +137,10 @@ class Board:
         action: Union[int, str],
         evaluate: bool = False
     ) -> bool:
+        if isinstance(action, str):
+            action = move_dict[action]
         board_copy = deepcopy(self.board)
-        rotated_board = np.rot90(board_copy, move_dict[action])
+        rotated_board = np.rot90(board_copy, action)
         stack(rotated_board)
         sum_up(rotated_board)
         stack(rotated_board)
