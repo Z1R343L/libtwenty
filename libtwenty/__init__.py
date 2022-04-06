@@ -127,6 +127,7 @@ class Board:
         if bytesio:
             buffer = BytesIO()
             im.save(buffer, 'PNG')
+            buffer.seek(0)
             return buffer
         return im
 
