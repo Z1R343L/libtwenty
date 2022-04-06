@@ -136,7 +136,7 @@ class Board:
         self, 
         action: Union[int, str],
         evaluate: bool = False
-    ) -> bool:
+    ):
         if isinstance(action, str):
             action = move_dict[action]
         board_copy = deepcopy(self.board)
@@ -152,6 +152,7 @@ class Board:
             self.board = spawn_tile(board=self.board)
             self.calculate_score()
             self.possible_moves = self.update_possible_moves()
+            return self
         return True
 
     def update_possible_moves(self) -> None:
