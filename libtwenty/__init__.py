@@ -144,7 +144,7 @@ class Board:
         stack(rotated_board)
         sum_up(rotated_board)
         stack(rotated_board)
-        board_copy = np.rot90(rotated_board, 4 - move_dict[action])
+        board_copy = np.rot90(rotated_board, 4 - action)
         if np.array_equal(self.board, board_copy, equal_nan=False):
             return False
         if not evaluate:
