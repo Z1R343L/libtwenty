@@ -157,7 +157,7 @@ class Board:
 
     def update_possible_moves(self) -> None:
         res, n, over = {}, 0, False
-        for direction in ["left", "right", "up", "down"]:
+        for direction in list(move_dict.values()):
             res[direction] = self.move(action=direction, evaluate=True)
             if not res[direction]:
                 n += 1
