@@ -108,10 +108,10 @@ class Board:
         return str(self.board)
 
     def to_state_string(self) -> str:
-        return ''.join(f'{i:02d}' for i in np.nditer(self.board))
+        return ''.join(f'{t_range.index(i):02d}' for i in np.nditer(self.board))
 
     def from_state_string(self, state_string: str) -> None:
-        self.board = np.reshape([int(state_string[i : i + 2]) for i in range(0, 32, 2)], (4, 4))
+        self.board = np.reshape([t_range[int(state_string[i : i + 2])] for i in range(0, 32, 2)], (4, 4))
 
     def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
         image_size = tile_size * self.size
