@@ -135,7 +135,7 @@ class Board:
         for x, y in itertools.product(range(self.size), range(self.size)):
             im_t = self.tiles[self.board[x][y]]
             y1, x1 = self.tile_size * x, self.tile_size * y
-            im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
+            im.paste(im=im_t, box=(x1 + self.tile_outline, y1 + self.tile_outline), mask=im_t)
         if bytesio:
             buffer = BytesIO()
             im.save(buffer, 'PNG')
