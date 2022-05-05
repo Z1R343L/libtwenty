@@ -129,7 +129,7 @@ class Board:
         image_size = self.tile_size * self.size
         im = Image.new(
             "RGB",
-            (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
+            (image_size + (self.tile_outline * 2), image_size + (self.tile_outline * 2)),
             0x8193A4,
         )
         for x, y in itertools.product(range(self.size), range(self.size)):
