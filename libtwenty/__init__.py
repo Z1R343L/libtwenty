@@ -49,7 +49,7 @@ def prep_font(font_size: int):
 
 def prep_tiles(tile_size: int = 200) -> dict:
     font_size = int((52 / 200) * tile_size)
-    font = f_cache.get(font_size) or prep_font(tile_size=tile_size)
+    font = f_cache.get(font_size) or prep_font(font_size=font_size)
     tile_radius = tile_size / 10
     tiles = {}
     for t in t_range:
