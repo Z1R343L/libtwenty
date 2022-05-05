@@ -12,7 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
-tile_outline = 6
 assets_path = Path(abspath(__file__)).parent / "assets"
 font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), 52, encoding="unic")
 
@@ -51,6 +50,7 @@ def prep_tiles(tile_size: int = 200) -> dict:
     font_size = int((52 / 200) * tile_size)
     font = f_cache.get(font_size) or prep_font(font_size=font_size)
     tile_radius = tile_size / 10
+    tile_outline = int((6 / 200) * tile_size)
     tiles = {}
     for t in t_range:
         t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
