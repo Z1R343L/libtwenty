@@ -13,7 +13,6 @@ from PIL import Image, ImageDraw, ImageFont
 move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
 assets_path = Path(abspath(__file__)).parent / "assets"
-font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), 52, encoding="unic")
 
 t_colors = {
     0: 0xFFA0B0BD,
@@ -31,10 +30,7 @@ t_colors = {
 }
 
 t_range = list(t_colors.keys())
-
-t_cache = {}
-f_cache = {}
-
+t_cache, f_cache = [{}] * 2
 
 def font_color(tile: int) -> int:
     return 0xFF656E77 if tile in {2, 4} else 0xFFF1F6F8
@@ -43,8 +39,6 @@ def prep_font(font_size: int):
     font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), font_size, encoding="unic")
     f_cache[font_size] = font
     return font
-
-
 
 def prep_tiles(tile_size: int = 200, tile_outline: int = 6) -> dict:
     font_size = int((52 / 200) * tile_size)
@@ -69,8 +63,6 @@ def prep_tiles(tile_size: int = 200, tile_outline: int = 6) -> dict:
     t_cache[tile_size] = tiles
     return tiles
 
-
-
 def stack(board) -> None:
     for i, j in itertools.product(range(len(board)), range(len(board))):
         k = i
@@ -79,13 +71,11 @@ def stack(board) -> None:
         if k != i:
             board[i][j], board[k][j] = board[k][j], 0
 
-
 def sum_up(board) -> None:
     for i, j in itertools.product(range(len(board) - 1), range(len(board))):
         if board[i][j] != 0 and board[i][j] == board[i + 1][j]:
             board[i][j] += board[i + 1][j]
             board[i + 1][j] = 0
-
 
 def spawn_tile(board) -> np.ndarray:
     zeroes_flatten = np.where(board == 0)
@@ -93,7 +83,6 @@ def spawn_tile(board) -> np.ndarray:
     random_index = zeroes_indices[choice(len(zeroes_indices), 1)[0]]
     board[random_index] = secrets.choice([2, 2, 4])
     return board
-
 
 class Board:
     def __init__(
@@ -107,10 +96,10 @@ class Board:
         self.tiles = t_cache.get(tile_size) or prep_tiles(tile_size=tile_size, tile_outline=self.tile_outline)
         self.score, self.possible_moves = [None] * 2
         self.size = size
-        self.board = np.zeros((self.size, self.size), int)
         if state_string:
             self.from_state_string(state_string=state_string)
         else:
+            self.board = np.zeros((self.size, self.size), int)
             self.board = spawn_tile(board=self.board)
             self.board = spawn_tile(board=self.board)
         self.calculate_score()
