@@ -115,16 +115,16 @@ class Board:
     def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
         image_size = self.tile_size * self.size
         tile_outline = int((6 / 200) * self.tile_size)
-        tiles = t_cache.get(tile_size) or prep_tiles(tile_size=tile_size, tile_outline=tile_outline)
+        tiles = t_cache.get(self.tile_size) or prep_tiles(tile_size=self.tile_size, tile_outline=tile_outline)
         im = Image.new(
             "RGB",
-            (image_size + (self.tile_outline * 2), image_size + (self.tile_outline * 2)),
+            (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
             0x8193A4,
         )
         for x, y in itertools.product(range(self.size), range(self.size)):
             im_t = tiles[self.board[x][y]]
             y1, x1 = self.tile_size * x, self.tile_size * y
-            im.paste(im=im_t, box=(x1 + self.tile_outline, y1 + self.tile_outline), mask=im_t)
+            im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if bytesio:
             buffer = BytesIO()
             im.save(buffer, 'PNG')
