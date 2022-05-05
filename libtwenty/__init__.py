@@ -103,7 +103,8 @@ class Board:
         state_string: Optional[str] = None
     ) -> None:
         self.tile_size = tile_size
-        self.tiles = t_cache.get(tile_size) or prep_tiles(tile_size=tile_size, tile_outline=int((6 / 200) * tile_size))
+        self.tile_outline = int((6 / 200) * tile_size)
+        self.tiles = t_cache.get(tile_size) or prep_tiles(tile_size=tile_size, tile_outline=self.tile_outline)
         self.score, self.possible_moves = [None] * 2
         self.size = size
         self.board = np.zeros((self.size, self.size), int)
