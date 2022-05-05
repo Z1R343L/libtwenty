@@ -12,7 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
-tile_size = 200
 tile_outline = 6
 tile_radius = 20
 assets_path = Path(abspath(__file__)).parent / "assets"
@@ -35,12 +34,14 @@ t_colors = {
 
 t_range = list(t_colors.keys())
 
+t_cache = {}
+
 
 def font_color(tile: int) -> int:
     return 0xFF656E77 if tile in {2, 4} else 0xFFF1F6F8
 
 
-def prep_tiles() -> dict:
+def prep_tiles(tile_size: int = 200) -> dict:
     tiles = {}
     for t in t_range:
         t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
@@ -57,10 +58,9 @@ def prep_tiles() -> dict:
             xt, yt = ((tile_size - tw) / 2), ((tile_size - th) / 2)
             t_id.text(xy=(xt, yt), text=str(t), font=font, fill=font_color(t))
         tiles[t] = t_im
+    t_cache[tile_size] = tiles
     return tiles
 
-
-tiles = prep_tiles()
 
 
 def stack(board) -> None:
@@ -91,8 +91,11 @@ class Board:
     def __init__(
         self,
         size: int = 4,
+        tile_size: int = 200
         state_string: Optional[str] = None
     ) -> None:
+        self.tile_size = tile_size
+        self.tiles = t_cache.get(tile_size) or prep_tiles(tile_size=tile_size)
         self.score, self.possible_moves = [None] * 2
         self.size = size
         self.board = np.zeros((self.size, self.size), int)
@@ -114,15 +117,15 @@ class Board:
         self.board = np.reshape([t_range[int(state_string[i : i + 2])] for i in range(0, 32, 2)], (4, 4))
 
     def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
-        image_size = tile_size * self.size
+        image_size = self.tile_size * self.size
         im = Image.new(
             "RGB",
             (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
             0x8193A4,
         )
         for x, y in itertools.product(range(self.size), range(self.size)):
-            im_t = tiles[self.board[x][y]]
-            y1, x1 = tile_size * x, tile_size * y
+            im_t = self.tiles[self.board[x][y]]
+            y1, x1 = self.tile_size * x, self.tile_size * y
             im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if bytesio:
             buffer = BytesIO()
