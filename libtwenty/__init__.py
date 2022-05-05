@@ -91,7 +91,7 @@ class Board:
     def __init__(
         self,
         size: int = 4,
-        tile_size: int = 200
+        tile_size: int = 200,
         state_string: Optional[str] = None
     ) -> None:
         self.tile_size = tile_size
