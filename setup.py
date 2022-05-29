@@ -5,7 +5,7 @@ with open("requirements.txt", encoding="utf8") as f:
 
 setuptools.setup(
     name="libtwenty",
-    version="2.2.5",
+    version="2.2.6",
     author="Z1R343L",
     description="2048 lib",
     url="https://github.com/z1r343l",
