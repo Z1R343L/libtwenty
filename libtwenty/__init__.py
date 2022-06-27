@@ -5,7 +5,7 @@ from os.path import abspath
 from pathlib import Path
 from typing import Optional, Union
 from io import BytesIO
-deom __future__ import annotations
+from __future__ import annotations
 
 import numpy as np
 from numpy.random import choice
