@@ -5,6 +5,7 @@ from os.path import abspath
 from pathlib import Path
 from typing import Optional, Union
 from io import BytesIO
+deom __future__ import annotations
 
 import numpy as np
 from numpy.random import choice
@@ -14,43 +15,48 @@ move_dict = {"up": 0, "right": 1, "down": 2, "left": 3}
 
 assets_path = Path(abspath(__file__)).parent / "assets"
 
-t_colors = {
-    0: 0xFFA0B0BD,
-    2: 0xFFDAE4EE,
-    4: 0xFFCEE1EE,
-    8: 0xFF7EB2F4,
-    16: 0xFF6B97F6,
-    32: 0xFF697EF7,
-    64: 0xFF4861F7,
-    128: 0xFF90D6EE,
-    256: 0xFF84D3EE,
-    512: 0xFF78D1EC,
-    1024: 0xFF3FC5ED,
-    2048: 0xFF2DC2ED
-}
+class Colors:
+    def __init__(self) -> None:
+        self.t_colors = {
+            0: 0xFFA0B0BD,
+            2: 0xFFDAE4EE,
+            4: 0xFFCEE1EE,
+            8: 0xFF7EB2F4,
+            16: 0xFF6B97F6,
+            32: 0xFF697EF7,
+            64: 0xFF4861F7,
+            128: 0xFF90D6EE,
+            256: 0xFF84D3EE,
+            512: 0xFF78D1EC,
+            1024: 0xFF3FC5ED,
+            2048: 0xFF2DC2ED
+        }
+    def gereedy_get(self, k: int = 0) -> int:
+        if k not in self.t_colors:
+            k = -1
+        return self.t_colors[k]
 
-t_range = list(t_colors.keys())
-t_cache, f_cache = [{}] * 2
+colors = Colors()
 
-def font_color(tile: int) -> int:
-    return 0xFF656E77 if tile in {2, 4} else 0xFFF1F6F8
-
-def prep_font(font_size: int):
-    font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), font_size, encoding="unic")
-    f_cache[font_size] = font
-    return font
-
-def prep_tiles(tile_size: int = 200, tile_outline: int = 6) -> dict:
-    font_size = int((52 / 200) * tile_size)
-    font = f_cache.get(font_size) or prep_font(font_size=font_size)
-    tile_radius = tile_size / 10
-    tiles = {}
-    for t in t_range:
+class Tiles:
+    def __init__(self, colors: Colors) -> None:
+        self.t_range = list(colors.t_colors.keys())
+        self.t_cache, self.f_cache = [{}] * 2
+        
+    def font_color(self, tile: int) -> int:
+        return 0xFF656E77 if tile in {2, 4} else 0xFFF1F6F8
+        
+    def prep_font(self, font_size: int):
+        font = ImageFont.truetype(str(assets_path / "AGAALER.TTF"), font_size, encoding="unic")
+        self.f_cache[font_size] = font
+        return font
+        
+    def build_tile(self, tile_size: int, t: int) -> Image.Image:
         t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
         t_id = ImageDraw.Draw(t_im)
         t_id.rounded_rectangle(
             xy=[(0, 0), (tile_size, tile_size)],
-            fill=t_colors[t],
+            fill=Colors.gereedy_get(k=t),
             outline=0x00000000,
             width=tile_outline,
             radius=tile_radius,
@@ -59,9 +65,15 @@ def prep_tiles(tile_size: int = 200, tile_outline: int = 6) -> dict:
             tw, th = font.getsize(str(t))
             xt, yt = ((tile_size - tw) / 2), ((tile_size - th) / 2)
             t_id.text(xy=(xt, yt), text=str(t), font=font, fill=font_color(t))
-        tiles[t] = t_im
-    t_cache[tile_size] = tiles
-    return tiles
+        return t_im
+
+    def prep_tiles(self, tile_size: int = 200, tile_outline: int = 6) -> dict:
+        font_size = int((52 / 200) * tile_size)
+        font = f_cache.get(font_size) or prep_font(font_size=font_size)
+        tile_radius = tile_size / 10
+        tiles = {build_tile(tile_size: int, t: int) for t in t_range}
+        t_cache[tile_size] = tiles
+        return tiles
 
 def stack(board) -> None:
     for i, j in itertools.product(range(len(board)), range(len(board))):
@@ -137,7 +149,7 @@ class Board:
         self, 
         action: Union[int, str],
         evaluate: bool = False
-    ):
+    ) -> Union[bool, 'Board']:
         if isinstance(action, str):
             action = move_dict[action]
         board_copy = deepcopy(self.board)
