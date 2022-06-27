@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 import secrets
 from copy import deepcopy
@@ -5,7 +7,6 @@ from os.path import abspath
 from pathlib import Path
 from typing import Optional, Union
 from io import BytesIO
-from __future__ import annotations
 
 import numpy as np
 from numpy.random import choice
