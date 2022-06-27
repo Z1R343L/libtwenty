@@ -71,7 +71,7 @@ class Tiles:
         font_size = int((52 / 200) * tile_size)
         font = f_cache.get(font_size) or prep_font(font_size=font_size)
         tile_radius = tile_size / 10
-        tiles = {build_tile(tile_size: int, t: int) for t in t_range}
+        tiles = {build_tile(tile_size, t) for t in t_range}
         t_cache[tile_size] = tiles
         return tiles
 
