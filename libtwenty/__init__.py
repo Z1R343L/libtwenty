@@ -70,10 +70,10 @@ class Tiles:
 
     def prep_tiles(self, tile_size: int = 200, tile_outline: int = 6) -> dict:
         font_size = int((52 / 200) * tile_size)
-        font = f_cache.get(font_size) or prep_font(font_size=font_size)
+        font = self.f_cache.get(font_size) or prep_font(font_size=font_size)
         tile_radius = tile_size / 10
         tiles = {build_tile(tile_size, t) for t in t_range}
-        t_cache[tile_size] = tiles
+        self.t_cache[tile_size] = tiles
         return tiles
 
 def stack(board) -> None:
@@ -128,7 +128,7 @@ class Board:
     def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
         image_size = self.tile_size * self.size
         tile_outline = int((6 / 200) * self.tile_size)
-        tiles = t_cache.get(self.tile_size) or prep_tiles(tile_size=self.tile_size, tile_outline=tile_outline)
+        tiles = self.t_cache.get(self.tile_size) or prep_tiles(tile_size=self.tile_size, tile_outline=tile_outline)
         im = Image.new(
             "RGB",
             (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
