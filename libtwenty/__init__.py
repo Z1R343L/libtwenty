@@ -40,9 +40,13 @@ class Colors:
 colors = Colors()
 
 class Tiles:
-    def __init__(self, colors: Colors) -> None:
+    def __init__(self, colors: Colors, tile_size) -> None:
         self.t_range = list(colors.t_colors.keys())
         self.t_cache, self.f_cache = [{}] * 2
+        self.colors = colors
+        self.tile_size = tile_size
+        self.tile_outline = int((6 / 200) * self.tile_size)
+        self.tile_radius = tile_size / 10
         
     def font_color(self, tile: int) -> int:
         return 0xFF656E77 if tile in {2, 4} else 0xFFF1F6F8
@@ -52,27 +56,29 @@ class Tiles:
         self.f_cache[font_size] = font
         return font
         
-    def build_tile(self, tile_size: int, t: int) -> Image.Image:
+    def build_tile(self, tile_size: int, t: int, font) -> bytes:
         t_im = Image.new("RGBA", (tile_size, tile_size), color=0x00000000)
         t_id = ImageDraw.Draw(t_im)
         t_id.rounded_rectangle(
             xy=[(0, 0), (tile_size, tile_size)],
-            fill=Colors.gereedy_get(k=t),
+            fill=self.colors.gereedy_get(k=t),
             outline=0x00000000,
-            width=tile_outline,
-            radius=tile_radius,
+            width=self.tile_outline,
+            radius=self.tile_radius,
         )
         if t != 0:
             tw, th = font.getsize(str(t))
             xt, yt = ((tile_size - tw) / 2), ((tile_size - th) / 2)
-            t_id.text(xy=(xt, yt), text=str(t), font=font, fill=font_color(t))
-        return t_im
+            t_id.text(xy=(xt, yt), text=str(t), font=font, fill=self.font_color(t))
+        with BytesIO() as b_io:
+            t_im.save(b_io, "PNG")
+            b_io.seek(0)
+            return b_io.read()
 
     def prep_tiles(self, tile_size: int = 200, tile_outline: int = 6) -> dict:
         font_size = int((52 / 200) * tile_size)
-        font = self.f_cache.get(font_size) or prep_font(font_size=font_size)
-        tile_radius = tile_size / 10
-        tiles = {build_tile(tile_size, t) for t in t_range}
+        font = self.f_cache.get(font_size) or self.prep_font(font_size=font_size)
+        tiles = {t: self.build_tile(tile_size, t, font) for t in self.t_range}
         self.t_cache[tile_size] = tiles
         return tiles
 
@@ -105,6 +111,7 @@ class Board:
         state_string: Optional[str] = None
     ) -> None:
         self.tile_size = tile_size
+        self.tiles = Tiles(Colors(), tile_size)
         self.score, self.possible_moves = [None] * 2
         self.size = size
         if state_string:
@@ -120,22 +127,22 @@ class Board:
         return str(self.board)
 
     def to_state_string(self) -> str:
-        return ''.join(f'{t_range.index(i):02d}' for i in np.nditer(self.board))
+        return ''.join(f'{self.tiles.t_range.index(i):02d}' for i in np.nditer(self.board))
 
     def from_state_string(self, state_string: str) -> None:
-        self.board = np.reshape([t_range[int(state_string[i : i + 2])] for i in range(0, 32, 2)], (4, 4))
+        self.board = np.reshape([self.tiles.t_range[int(state_string[i : i + 2])] for i in range(0, 32, 2)], (4, 4))
 
     def render(self, bytesio: bool = False) -> Union[Image.Image, BytesIO]:
         image_size = self.tile_size * self.size
         tile_outline = int((6 / 200) * self.tile_size)
-        tiles = self.t_cache.get(self.tile_size) or prep_tiles(tile_size=self.tile_size, tile_outline=tile_outline)
+        tiles = self.tiles.prep_tiles(tile_size=self.tile_size, tile_outline=tile_outline)
         im = Image.new(
             "RGB",
             (image_size + (tile_outline * 2), image_size + (tile_outline * 2)),
             0x8193A4,
         )
         for x, y in itertools.product(range(self.size), range(self.size)):
-            im_t = tiles[self.board[x][y]]
+            im_t = Image.open(BytesIO(tiles[self.board[x][y]]))
             y1, x1 = self.tile_size * x, self.tile_size * y
             im.paste(im=im_t, box=(x1 + tile_outline, y1 + tile_outline), mask=im_t)
         if bytesio:
